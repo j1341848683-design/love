@@ -69,8 +69,9 @@ const App: React.FC = () => {
         return c;
       }));
     } catch (error) {
-      console.error("Analysis failed:", error);
-      alert(`分析失败: ${error instanceof Error ? error.message : "连接超时，请重试"}`);
+      console.error("Analysis process error:", error);
+      // 将详细错误反馈给用户
+      alert(`⚠️ 羁绊分析中断\n原因: ${error instanceof Error ? error.message : "网络连接异常，请确保 API Key 已在系统后台配置。"}`);
     } finally {
       setLoading(false);
     }
