@@ -1,6 +1,4 @@
 
-export type AIProvider = 'gemini' | 'siliconflow';
-
 export interface Character {
   id: string;
   name: string;

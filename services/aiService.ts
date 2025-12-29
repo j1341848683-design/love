@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { Character, AIResponse, AIProvider } from "../types";
+import { Character, AIResponse } from "../types";
 
 const getSystemPrompt = (character: Character, userInput: string) => `
 你现在是一个专业的“社交行为分析助手”。
@@ -18,7 +18,7 @@ const getSystemPrompt = (character: Character, userInput: string) => `
 "${userInput}"
 
 【分析任务】
-1. 以客观但带有温情的语气，给用户一段“行为影响分析报告” (characterResponse)。不要模仿对方说话。
+1. 以客观但带有温情的语气，给用户一段“行为影响分析报告” (characterResponse)。
 2. 判断好感度的变动 (favorabilityChange)，范围在 -15 到 +20 之间。
 3. 根据此次记录更新一个关系现状描述 (newStatus)。
 4. 给出详细的判定理由 (reasoning)。
@@ -32,82 +32,68 @@ const getSystemPrompt = (character: Character, userInput: string) => `
 }
 `;
 
-async function callGemini(character: Character, userInput: string): Promise<AIResponse> {
+/**
+ * 核心：获取最新的 AI 实例
+ * 每次调用都重新创建以确保 API_KEY 的即时性 (遵循 SDK 关于 API Key Selection 的指南)
+ */
+const getAIClient = () => {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("检测到系统 API_KEY 尚未配置。请在部署环境或 AISTUDIO 中设置环境变量。");
-  }
+  if (!apiKey) throw new Error("未检测到有效的 API Key");
+  return new GoogleGenAI({ apiKey });
+};
 
-  // 规范要求：在调用前创建实例
-  const ai = new GoogleGenAI({ apiKey });
-  
+/**
+ * 连通性测试：验证 API 是否可用
+ */
+export async function testAIConnection(): Promise<boolean> {
   try {
-    const response = await ai.models.generateContent({
+    const ai = getAIClient();
+    // 遵循 SDK 指南：设置 maxOutputTokens 时必须同时设置 thinkingBudget 以预留输出空间
+    await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: getSystemPrompt(character, userInput),
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            favorabilityChange: { type: Type.NUMBER },
-            newStatus: { type: Type.STRING },
-            characterResponse: { type: Type.STRING },
-            reasoning: { type: Type.STRING },
-          },
-          required: ["favorabilityChange", "newStatus", "characterResponse", "reasoning"],
-        },
-      },
+      contents: "ping",
+      config: { 
+        maxOutputTokens: 5,
+        thinkingConfig: { thinkingBudget: 0 } 
+      }
     });
-
-    const text = response.text;
-    if (!text) throw new Error("AI 返回了空响应，请检查输入内容是否合规。");
-    
-    return JSON.parse(text.trim()) as AIResponse;
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    throw new Error(error instanceof Error ? error.message : "连接 Gemini 服务时发生未知错误");
+    return true;
+  } catch (e) {
+    console.error("AI Connection Test Failed:", e);
+    return false;
   }
 }
 
-async function callSiliconFlow(character: Character, userInput: string): Promise<AIResponse> {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("硅基流动 API Key 尚未配置。");
-  }
-
-  const response = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.0-flash-001", // 更新为允许使用的模型别名
-      messages: [
-        { role: "user", content: getSystemPrompt(character, userInput) }
-      ],
-      response_format: { type: "json_object" }
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(`第三方服务错误: ${response.status} ${errorData.error?.message || ''}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0].message.content;
-  return JSON.parse(content) as AIResponse;
-}
-
+/**
+ * 核心互动评估逻辑
+ */
 export async function evaluateInteraction(
   character: Character,
-  userInput: string,
-  provider: AIProvider = 'gemini'
+  userInput: string
 ): Promise<AIResponse> {
-  if (provider === 'siliconflow') {
-    return callSiliconFlow(character, userInput);
-  }
-  return callGemini(character, userInput);
+  const ai = getAIClient();
+  
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: getSystemPrompt(character, userInput),
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          favorabilityChange: { type: Type.NUMBER },
+          newStatus: { type: Type.STRING },
+          characterResponse: { type: Type.STRING },
+          reasoning: { type: Type.STRING },
+        },
+        required: ["favorabilityChange", "newStatus", "characterResponse", "reasoning"],
+      },
+    },
+  });
+
+  // 遵循 SDK 指南：直接访问 .text 属性 (Property, not a method)
+  const text = response.text;
+  if (!text) throw new Error("AI 返回了空数据");
+  
+  return JSON.parse(text.trim());
 }
