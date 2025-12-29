@@ -4,24 +4,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>人际关系分析系统</title>
+  <title>次元羁绊系统</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#f43f5e">
+  <meta name="theme-color" content="#ff85a2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+    
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: linear-gradient(135deg, #fff5f7 0%, #f0f4ff 100%);
+      background-attachment: fixed;
       -webkit-tap-highlight-color: transparent;
+      color: #4a4e69;
     }
-    /* 适配安卓沉浸式状态栏 */
-    @supports (padding-top: env(safe-area-inset-top)) {
-      header {
-        padding-top: env(safe-area-inset-top);
-      }
+
+    .font-anime {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .heart-pulse {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .text-stroke-pink {
+      text-shadow: 2px 2px 0px rgba(244, 63, 94, 0.1);
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
     }
   </style>
 <script type="importmap">
@@ -37,16 +64,5 @@
 </head>
 <body>
   <div id="root"></div>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-          console.log('SW registered!', reg);
-        }).catch(err => {
-          console.log('SW registration failed: ', err);
-        });
-      });
-    }
-  </script>
 </body>
 </html>

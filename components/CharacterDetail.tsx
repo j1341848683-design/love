@@ -13,12 +13,8 @@ const CharacterDetail: React.FC<CharacterDetailProps> = ({ character, onBack, on
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [character.history]);
 
   const handleSend = () => {
@@ -28,100 +24,100 @@ const CharacterDetail: React.FC<CharacterDetailProps> = ({ character, onBack, on
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-180px)] bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-      {/* 头部信息 */}
-      <div className="bg-slate-50 p-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 hover:bg-white rounded-full transition-colors text-slate-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+    <div className="flex flex-col h-[calc(100vh-140px)] gap-4">
+      {/* 顶部状态栏 */}
+      <div className="glass-card rounded-3xl p-4 flex items-center justify-between shadow-sm border-2 border-white">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="p-2 bg-white rounded-full text-pink-500 shadow-sm hover:scale-110 transition-transform border border-pink-50">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <div className="relative">
-            <img
-              src={character.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${character.name}`}
-              className="w-10 h-10 rounded-full object-cover bg-slate-200 border border-slate-200"
-              alt=""
-            />
-          </div>
           <div>
-            <h3 className="font-bold text-slate-800 leading-tight">分析对象：{character.name}</h3>
-            <span className="text-xs text-rose-500 font-medium">当前状态：{character.status}</span>
+            <h3 className="font-anime text-xl text-slate-800 tracking-tight">{character.name}</h3>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[10px] text-pink-400 font-bold tracking-widest uppercase">好感记录分析中</span>
+            </div>
           </div>
         </div>
-        
         <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-slate-400">关系分值</span>
-            <span className={`text-sm font-bold ${character.favorability >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-              {character.favorability}
-            </span>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="heart-pulse text-rose-500 text-xl">❤️</span>
+            <span className="text-2xl font-black text-rose-500 leading-none">{character.favorability}%</span>
           </div>
-          <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className="w-24 h-2 bg-slate-100/80 rounded-full overflow-hidden shadow-inner">
             <div 
-              className={`h-full transition-all duration-700 ${character.favorability >= 0 ? 'bg-emerald-400' : 'bg-rose-400'}`} 
-              style={{ width: `${50 + (character.favorability / 2)}%` }} // 居中展示，0分在中间
+              className="h-full bg-gradient-to-r from-pink-300 to-rose-500 transition-all duration-700 shadow-[0_0_8px_rgba(244,63,94,0.3)]" 
+              style={{ width: `${character.favorability}%` }}
             ></div>
           </div>
         </div>
       </div>
 
-      {/* 记录历史 */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-slate-50/20">
+      {/* 历史记录 */}
+      <div className="flex-1 overflow-y-auto space-y-6 pb-4 px-2 custom-scrollbar">
         {character.history.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-3 shadow-sm border border-slate-100">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          <div className="h-full flex flex-col items-center justify-center opacity-40">
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 shadow-inner border-4 border-pink-50">
+              <span className="text-5xl">📖</span>
             </div>
-            <p className="text-sm">暂无互动记录。<br/>请在这里输入你们最近发生的具体互动。</p>
+            <p className="font-anime text-pink-400 text-lg">尚未记录互动</p>
+            <p className="text-xs text-slate-400 mt-1 font-medium italic">输入一件你们之间发生的小事，AI 将为你分析...</p>
           </div>
         ) : (
           [...character.history].reverse().map((item) => (
-            <div key={item.id} className="space-y-3">
-              <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono">
-                <span>EVENT LOG // {new Date(item.timestamp).toLocaleString()}</span>
-                <div className="h-px flex-1 bg-slate-100"></div>
+            <div key={item.id} className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* 用户行为记录 */}
+              <div className="flex justify-end pr-2">
+                <div className="bg-slate-700 text-white rounded-[1.2rem] rounded-tr-none px-4 py-2.5 text-sm shadow-md max-w-[85%] border border-slate-600 font-medium">
+                  {item.userInput}
+                </div>
               </div>
               
-              {/* 互动记录 */}
-              <div className="bg-slate-100/50 border border-slate-100 rounded-2xl px-4 py-3">
-                <p className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">互动描述</p>
-                <p className="text-sm text-slate-700">{item.userInput}</p>
-              </div>
-              
-              {/* AI 分析 */}
-              <div className="bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm relative overflow-hidden">
-                <div className={`absolute top-0 left-0 w-1 h-full ${item.favorabilityChange >= 0 ? 'bg-emerald-400' : 'bg-rose-400'}`}></div>
-                <p className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">心理分析报告</p>
-                <p className="text-sm text-slate-800 leading-relaxed mb-3">{item.characterResponse}</p>
-                <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.favorabilityChange >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                    好感度 {item.favorabilityChange >= 0 ? `+${item.favorabilityChange}` : item.favorabilityChange}
-                  </span>
+              {/* AI 分析反馈 */}
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-2xl border-2 border-white shadow-md flex-shrink-0 bg-indigo-500 flex items-center justify-center text-white text-xl">
+                  🤖
+                </div>
+                <div className="flex flex-col gap-1 max-w-[85%]">
+                  <div className="glass-card border-l-4 border-l-indigo-400 rounded-[1.2rem] rounded-tl-none px-4 py-3 shadow-md">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[11px] font-black text-indigo-500 uppercase tracking-tighter">AI 分析报告</span>
+                      <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${item.favorabilityChange >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                        羁绊 {item.favorabilityChange >= 0 ? `+${item.favorabilityChange}` : item.favorabilityChange}%
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-700 leading-relaxed font-bold italic">“{item.characterResponse}”</p>
+                    
+                    {/* 判定理由 */}
+                    {item.reasoning && (
+                      <div className="mt-3 pt-2.5 border-t border-indigo-100/50">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="w-1 h-1 rounded-full bg-indigo-300"></span>
+                          <span className="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">深度判定依据</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
+                          {item.reasoning}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           ))
         )}
         {loading && (
-          <div className="flex justify-center py-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-full text-xs animate-pulse">
-              <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              正在分析人际关系动态...
-            </div>
+          <div className="flex items-center gap-3 px-6 py-3 bg-indigo-500 text-white rounded-full text-xs font-black animate-bounce mx-auto w-fit shadow-xl">
+            <span>正在深度解析社交行为...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* 输入区域 */}
-      <div className="p-4 bg-white border-t border-slate-100">
-        <div className="relative flex items-end gap-3 bg-slate-50 rounded-2xl p-2 pr-4 border border-slate-200 focus-within:border-slate-400 transition-all">
+      <div className="glass-card rounded-[2rem] p-3 shadow-xl border-2 border-white">
+        <div className="flex items-center gap-3">
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -131,26 +127,21 @@ const CharacterDetail: React.FC<CharacterDetailProps> = ({ character, onBack, on
                 handleSend();
               }
             }}
-            placeholder={`记录你与 ${character.name} 的互动事件（例如：今天我们一起看了电影，讨论很愉快）...`}
-            className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-2 px-3 resize-none min-h-[44px] max-h-32"
-            rows={2}
+            placeholder={`描述一下发生了什么（如：今天我请 TA 喝了咖啡）...`}
+            className="flex-1 bg-white/40 border-none focus:ring-2 focus:ring-pink-200 rounded-2xl text-sm py-3 px-4 resize-none h-[52px] placeholder:text-slate-300 font-bold"
+            rows={1}
           />
           <button
             onClick={handleSend}
             disabled={!inputText.trim() || loading}
-            className={`p-2 rounded-xl transition-all mb-1 ${
-              inputText.trim() && !loading ? 'bg-slate-800 text-white shadow-md' : 'bg-slate-200 text-slate-400'
+            className={`w-12 h-12 flex items-center justify-center rounded-2xl shadow-lg transition-all active:scale-90 ${
+              inputText.trim() && !loading ? 'bg-rose-500 text-white scale-100 shadow-pink-200' : 'bg-slate-200 text-slate-400 scale-95 opacity-50'
             }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
             </svg>
           </button>
-        </div>
-        <div className="mt-2 flex items-center justify-center gap-4 text-[10px] text-slate-400">
-          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 正向社交</span>
-          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span> 负向冲突</span>
-          <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span> AI 中立分析</span>
         </div>
       </div>
     </div>

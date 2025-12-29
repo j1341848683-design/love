@@ -1,7 +1,10 @@
 
+export type AIProvider = 'gemini' | 'siliconflow';
+
 export interface Character {
   id: string;
   name: string;
+  relationshipType: string;
   personality: string;
   description: string;
   avatarUrl: string;
@@ -16,6 +19,7 @@ export interface Interaction {
   characterResponse: string;
   favorabilityChange: number;
   timestamp: number;
+  reasoning?: string;
 }
 
 export interface AIResponse {
