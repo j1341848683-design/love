@@ -1,0 +1,22 @@
+
+{
+  "name": "人际关系分析系统",
+  "short_name": "好感度分析",
+  "description": "基于 AI 的现实人际关系互动评估工具",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#f43f5e",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/initials/svg?seed=Affinity&backgroundColor=f43f5e",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/initials/svg?seed=Affinity&backgroundColor=f43f5e",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
